@@ -19,13 +19,21 @@ export class MobileObject {
     this.#xPos = startX;
     this.#yPos = startY;
     this.#points = points;
+    this.#objectWidth = this.#image.width;
+    this.#objectHeight = this.#image.height;
+  }
+
+  get objectWidth() {
+    return this.#objectWidth
+  }
+
+  get objectHeight() {
+    return this.#objectHeight;
   }
 
   update() {
     const nextX = this.#points[this.#nextIndex][0];
     const nextY = this.#points[this.#nextIndex][1];
-
-    
 
     if (this.#xPos > nextX && !this.#xIsOk) {
       this.#xPos = this.#xPos - this.#moveStep;
@@ -63,7 +71,6 @@ export class MobileObject {
       this.#yIsOk = true;
     }
 
-
     if (this.#xIsOk && this.#yIsOk) {
       if (this.#points.length - 1 === this.#nextIndex) {
         this.#nextIndex = 0;  
@@ -77,6 +84,13 @@ export class MobileObject {
   }
 
   draw() {
-    this.#context.drawImage(this.#image, this.#xPos, this.#yPos);
+    this.#context.drawImage(this.#image, this.#xPos - this.#objectWidth / 2, this.#yPos - this.#objectHeight / 2);
+  }
+
+  endPoints() {
+    return {
+      x: this.#xPos - this.#objectWidth / 2,
+      y: this.#yPos - this.#objectHeight / 2,
+    }
   }
 }

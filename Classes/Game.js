@@ -14,6 +14,7 @@ export class Game {
   static #staticObjects = [];
   static #movingObjects = [];
 
+  gameInterval;
   #player;
   #context;
   #height;
@@ -36,8 +37,8 @@ export class Game {
 
     Game.#movingObjects.push(new Indian(this.#context));
     Game.#movingObjects.push(new Solider(this.#context));
-    Game.#movingObjects.push(new Bear(this.#context));
-    Game.#movingObjects.push(new ClaimJumper(this.#context));
+    // Game.#movingObjects.push(new Bear(this.#context));
+    // Game.#movingObjects.push(new ClaimJumper(this.#context));
   }
 
 
@@ -81,37 +82,35 @@ export class Game {
   update() {
     Game.#movingObjects.forEach(object => object.update());
 
-    if (Game.#gameActions.left && !this.checkCollision(this.#player.endPoints().x - this.#player.moveStep, this.#player.endPoints().y, this.#player.playerWidth, this.#player.playerHeight)) {
+    if (Game.#gameActions.left && !this.checkBarriers(this.#player.endPoints().x - this.#player.moveStep, this.#player.endPoints().y, this.#player.playerWidth, this.#player.playerHeight)) {
       this.#player.moveLeft();
     }
 
-    if (Game.#gameActions.right && !this.checkCollision(this.#player.endPoints().x + this.#player.moveStep, this.#player.endPoints().y, this.#player.playerWidth, this.#player.playerHeight)) {
+    if (Game.#gameActions.right && !this.checkBarriers(this.#player.endPoints().x + this.#player.moveStep, this.#player.endPoints().y, this.#player.playerWidth, this.#player.playerHeight)) {
       this.#player.moveRight();
     }
 
-    if (Game.#gameActions.up && !this.checkCollision(this.#player.endPoints().x, this.#player.endPoints().y - this.#player.moveStep, this.#player.playerWidth, this.#player.playerHeight)) {
+    if (Game.#gameActions.up && !this.checkBarriers(this.#player.endPoints().x, this.#player.endPoints().y - this.#player.moveStep, this.#player.playerWidth, this.#player.playerHeight)) {
       this.#player.moveUp();
     }
 
-    if (Game.#gameActions.down && !this.checkCollision(this.#player.endPoints().x, this.#player.endPoints().y + this.#player.moveStep, this.#player.playerWidth, this.#player.playerHeight)) {
+    if (Game.#gameActions.down && !this.checkBarriers(this.#player.endPoints().x, this.#player.endPoints().y + this.#player.moveStep, this.#player.playerWidth, this.#player.playerHeight)) {
       this.#player.moveDown();
     }
+
+    this.checkEnemies(this.#player.endPoints().x, this.#player.endPoints().y, this.#player.playerWidth, this.#player.playerHeight);
   }
 
   draw() {
     this.#context.drawImage(Game.#backgroundImage, 0, 0)
     this.#player.draw();
     Game.#staticObjects.forEach(x => x.draw());
-    Game.#movingObjects.forEach(x => x.draw());
+    // Game.#movingObjects.forEach(x => x.draw());
+    Game.#movingObjects.forEach(x => x.tempDraw(this.#context));
   }
 
 
-  checkCollision = (x, y, width, height) => {
-    let r1x = x;
-    let r1y = y;
-    let r1w = width;
-    let r1h = height;
-
+  checkBarriers (r1x, r1y, r1w, r1h) {
     let collision = false;
   
     Game.#staticObjects.forEach(barrier => {
@@ -124,6 +123,28 @@ export class Game {
           collision =  true;
       }
     })
+
+    return collision;
+  }
+
+  checkEnemies(r1x, r1y, r1w, r1h) {
+    let collision = false;
+
+    Game.#movingObjects.forEach(object => {
+      let r2x = object.endPoints().x;
+      let r2y = object.endPoints().y;
+      let r2w = object.objectWidth;
+      let r2h = object.objectHeight;
+      
+      if (r1x + r1w >= r2x && r1x <= r2x + r2w && r1y + r1h >= r2y && r1y <= r2y + r2h) {
+          collision =  true;
+      }
+    });
+
+    if (collision) {
+      setTimeout(() => clearInterval(this.gameInterval), 70);
+    }
+
     return collision;
   }
 }

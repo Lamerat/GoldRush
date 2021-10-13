@@ -21,4 +21,12 @@ export class Solider extends MobileObject {
     super(canvas, Solider.#soliderImage, Solider.#startPositions[0].x, Solider.#startPositions[0].y, Solider.#points[0])
   }
 
+  tempDraw(ctx) {
+    const img = new Image();
+    img.src = Solider.#soliderImage;
+    const width = img.width;
+    const height = img.height;
+    Solider.#points[0].forEach(x => ctx.drawImage(img, x[0] - width / 2, x[1] - height / 2))
+  }
+
 }
