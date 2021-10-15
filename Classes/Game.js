@@ -21,6 +21,7 @@ export class Game {
   static #staticObjects = [];
 
   gameInterval;
+  #currentTNT;
   #mines = {one: false, two: false, three: false, four: false};
   #player;
   #context;
@@ -160,8 +161,15 @@ export class Game {
       }
     });
 
-    if (collision && objectType !== enemyType.CLAIM_JUMPER) {
-      setTimeout(() => clearInterval(this.gameInterval), 70);
+    if (collision) {
+      if (objectType === enemyType.CLAIM_JUMPER) {
+        if (this.#player.haveTNT) {
+          Game.#staticObjects.push(this.#currentTNT);
+          this.#player.haveTNT = false;
+        }
+      } else {
+        setTimeout(() => clearInterval(this.gameInterval), 70);
+      }
     }
 
     return collision;
@@ -178,6 +186,7 @@ export class Game {
           if(!this.#player.haveTNT && object.type === staticTypes.TNT) {
             Game.#staticObjects = Game.#staticObjects.filter(x => x.id !== object.id);
             this.#player.haveTNT = true;
+            this.#currentTNT = object;
           }
       }
     });

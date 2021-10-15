@@ -28,6 +28,14 @@ export class Dynamite {
     return this.#id;
   }
 
+  get xPos() {
+    return this.#xPos;
+  }
+
+  get yPos() {
+    return this.#yPos;
+  }
+
 
   constructor (canvas, x, y) {
     this.#context = canvas;
