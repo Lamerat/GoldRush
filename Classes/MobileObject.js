@@ -36,28 +36,48 @@ export class MobileObject {
     const nextY = this.#points[this.#nextIndex][1];
 
     if (this.#xPos > nextX && !this.#xIsOk) {
-      this.#xPos = this.#xPos - this.#moveStep;
+      if (this.#xPos - this.#moveStep < nextX) {
+        this.#xPos = nextX;
+      } else {
+        this.#xPos = this.#xPos - this.#moveStep;
+      }
+
       if (this.#xPos <= nextX) {
         this.#xIsOk = true;
       }
     }
 
     if (this.#xPos < nextX && !this.#xIsOk) {
-      this.#xPos = this.#xPos + this.#moveStep;
+      if (this.#xPos + this.#moveStep > nextX) {
+        this.#xPos = nextX;
+      } else {
+        this.#xPos = this.#xPos + this.#moveStep;
+      }
+
       if (this.#xPos >= nextX) {
         this.#xIsOk = true;
       }
     }
 
     if (this.#yPos > nextY && !this.#yIsOk) {
-      this.#yPos = this.#yPos - this.#moveStep;
+      if (this.#yPos - this.#moveStep < nextY) {
+        this.#yPos = nextY;
+      } else {
+        this.#yPos = this.#yPos - this.#moveStep;
+      }
+
       if (this.#yPos <= nextY) {
         this.#yIsOk = true;
       }
     }
 
     if (this.#yPos < nextY && !this.#yIsOk) {
-      this.#yPos = this.#yPos + this.#moveStep;
+      if (this.#yPos + this.#moveStep > nextY) {
+        this.#yPos = nextY;
+      } else {
+        this.#yPos = this.#yPos + this.#moveStep;
+      }
+
       if (this.#yPos >= nextY) {
         this.#yIsOk = true;
       }

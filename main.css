@@ -1,3 +1,9 @@
 #gameCanvas {
     background-color: black;
+    margin: auto;
+}
+
+.mainDiv {
+    display: flex;
+    align-items: center;
 }

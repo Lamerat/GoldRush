@@ -4,11 +4,11 @@ import { MobileObject } from './MobileObject.js';
 export class Solider extends MobileObject {
   static #soliderImage = '../images/soldier.png';
   static #startPositions = [
-    { x: 558, y: 366 }
+    { x: 580, y: 346 }
   ];
   
   static #points = [
-    [[558, 456], [738, 456], [738, 326], [460, 175], [460, 96], [470, 96], [470, 0], [720, 0], [720, 180]],
+    [[580, 474], [752, 474], [752, 350], [536, 195], [478, 195], [478, 120], [492, 110], [492, 22], [740, 22], [740, 206]],
   ];
 
   #type = enemyType.SOLDIER;

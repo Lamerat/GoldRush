@@ -6,6 +6,7 @@ import { Indian } from './Indian.js';
 import { Solider } from './Solider.js';
 import { Bear } from './Bear.js';
 import { ClaimJumper } from './ClaimJumper.js';
+import { enemyType } from '../common/enemy-type.js';
 
 export class Game {
   static #singleton = false;
@@ -37,8 +38,8 @@ export class Game {
 
     Game.#movingObjects.push(new Indian(this.#context));
     Game.#movingObjects.push(new Solider(this.#context));
-    // Game.#movingObjects.push(new Bear(this.#context));
-    // Game.#movingObjects.push(new ClaimJumper(this.#context));
+    Game.#movingObjects.push(new Bear(this.#context));
+    Game.#movingObjects.push(new ClaimJumper(this.#context));
   }
 
 
@@ -105,8 +106,8 @@ export class Game {
     this.#context.drawImage(Game.#backgroundImage, 0, 0)
     this.#player.draw();
     Game.#staticObjects.forEach(x => x.draw());
-    // Game.#movingObjects.forEach(x => x.draw());
-    Game.#movingObjects.forEach(x => x.tempDraw(this.#context));
+    Game.#movingObjects.forEach(x => x.draw());
+    // Game.#movingObjects.forEach(x => x.tempDraw(this.#context));
   }
 
 
@@ -129,6 +130,7 @@ export class Game {
 
   checkEnemies(r1x, r1y, r1w, r1h) {
     let collision = false;
+    let objectType = null;
 
     Game.#movingObjects.forEach(object => {
       let r2x = object.endPoints().x;
@@ -138,10 +140,13 @@ export class Game {
       
       if (r1x + r1w >= r2x && r1x <= r2x + r2w && r1y + r1h >= r2y && r1y <= r2y + r2h) {
           collision =  true;
+          objectType =  object.type;
       }
     });
 
-    if (collision) {
+    
+
+    if (collision && objectType !== enemyType.CLAIM_JUMPER) {
       setTimeout(() => clearInterval(this.gameInterval), 70);
     }
 
