@@ -2,7 +2,7 @@ import { enemyType } from '../common/enemy-type.js';
 import { MobileObject } from './MobileObject.js';
 
 export class Solider extends MobileObject {
-  static #soliderImage = '../images/soldier.png';
+  static #soliderImage = './images/soldier.png';
   static #startPositions = [
     { x: 580, y: 346 }
   ];

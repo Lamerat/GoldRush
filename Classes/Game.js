@@ -43,9 +43,9 @@ export class Game {
 
     staticObjectsCoordinates.forEach(coords => Game.#barriers.push(new StaticObject(this.#context, ...coords)));
 
-    // Game.#movingObjects.push(new Indian(this.#context));
-    // Game.#movingObjects.push(new Solider(this.#context));
-    // Game.#movingObjects.push(new Bear(this.#context));
+    Game.#movingObjects.push(new Indian(this.#context));
+    Game.#movingObjects.push(new Solider(this.#context));
+    Game.#movingObjects.push(new Bear(this.#context));
     Game.#movingObjects.push(new ClaimJumper(this.#context));
     Game.#staticObjects.push(new Dynamite(this.#context, 252, 25));
     Game.#staticObjects.push(new Dynamite(this.#context, 155, 125));

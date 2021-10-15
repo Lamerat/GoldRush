@@ -2,7 +2,7 @@ import { enemyType } from '../common/enemy-type.js';
 import { MobileObject } from './MobileObject.js';
 
 export class Indian extends MobileObject {
-  static #indianImage = '../images/indian.png';
+  static #indianImage = './images/indian.png';
   static #startPositions = [
     { x: 620, y: 116 }
   ];

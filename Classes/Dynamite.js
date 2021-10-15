@@ -2,7 +2,7 @@ import staticTypes from '../common/static-types.js';
 
 export class Dynamite {
   static #dynamiteId = 0;
-  static #dynamiteImagePath = '../images/tnt.png';
+  static #dynamiteImagePath = './images/tnt.png';
   #dynamiteImage = new Image();
   #type = staticTypes.TNT;
   #context;

@@ -2,7 +2,7 @@ import { enemyType } from '../common/enemy-type.js';
 import { MobileObject } from './MobileObject.js';
 
 export class ClaimJumper extends MobileObject {
-  static #claimJumper = '../images/claim_jumper.png';
+  static #claimJumper = './images/claim_jumper.png';
   static #startPositions = [
     { x: 80, y: 10 }
   ];
