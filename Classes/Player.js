@@ -7,6 +7,7 @@ export class Player {
   #playerWidth;
   #playerHeight;
   #moveStep = 3;
+  #haveTNT = false;
 
   #minX;
   #maxX;
@@ -15,7 +16,7 @@ export class Player {
 
   constructor(canvas) {
     this.#context = canvas;
-    Player.#playerImage.src = '../images/player.png';
+    Player.#playerImage.src = './images/player.png';
     this.#playerWidth = Player.#playerImage.width;
     this.#playerHeight = Player.#playerImage.height;
 
@@ -35,6 +36,17 @@ export class Player {
 
   get moveStep() {
     return this.#moveStep;
+  }
+
+  get haveTNT() {
+    return this.#haveTNT;
+  }
+
+  set haveTNT(value) {
+    if (typeof value !== 'boolean') {
+      throw new Error ('haveTNT must be boolean!');
+    }
+    this.#haveTNT = value;
   }
 
 

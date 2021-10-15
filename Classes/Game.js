@@ -7,15 +7,21 @@ import { Solider } from './Solider.js';
 import { Bear } from './Bear.js';
 import { ClaimJumper } from './ClaimJumper.js';
 import { enemyType } from '../common/enemy-type.js';
+import { Dynamite } from './Dynamite.js';
+import staticTypes from '../common/static-types.js';
 
 export class Game {
-  static #singleton = false;
+  static #bagImage = new Image ();
+  
   static #backgroundImage = new Image();
+  static #singleton = false;
   static #gameActions = { left: false, right: false, up: false, down: false };
-  static #staticObjects = [];
+  static #barriers = [];
   static #movingObjects = [];
+  static #staticObjects = [];
 
   gameInterval;
+  #mines = {one: false, two: false, three: false, four: false};
   #player;
   #context;
   #height;
@@ -30,16 +36,21 @@ export class Game {
     this.#width = this.#context.canvas.width;
     Game.#singleton = true;
     Game.#backgroundImage.src = './images/background.png';
+    Game.#bagImage.src = './images/bag.png'
     this.#width = this.#context.canvas.width;
     this.#height = this.#context.canvas.height;
     this.#player = new Player(context);
 
-    staticObjectsCoordinates.forEach(coords => Game.#staticObjects.push(new StaticObject(this.#context, ...coords)));
+    staticObjectsCoordinates.forEach(coords => Game.#barriers.push(new StaticObject(this.#context, ...coords)));
 
-    Game.#movingObjects.push(new Indian(this.#context));
-    Game.#movingObjects.push(new Solider(this.#context));
-    Game.#movingObjects.push(new Bear(this.#context));
+    // Game.#movingObjects.push(new Indian(this.#context));
+    // Game.#movingObjects.push(new Solider(this.#context));
+    // Game.#movingObjects.push(new Bear(this.#context));
     Game.#movingObjects.push(new ClaimJumper(this.#context));
+    Game.#staticObjects.push(new Dynamite(this.#context, 252, 25));
+    Game.#staticObjects.push(new Dynamite(this.#context, 155, 125));
+    Game.#staticObjects.push(new Dynamite(this.#context, 155, 250));
+    Game.#staticObjects.push(new Dynamite(this.#context, 155, 445));
   }
 
 
@@ -100,11 +111,16 @@ export class Game {
     }
 
     this.checkEnemies(this.#player.endPoints().x, this.#player.endPoints().y, this.#player.playerWidth, this.#player.playerHeight);
+    this.checkStatic(this.#player.endPoints().x, this.#player.endPoints().y, this.#player.playerWidth, this.#player.playerHeight);
+    this.checkMines(this.#player.endPoints().x, this.#player.endPoints().y);
   }
+
 
   draw() {
     this.#context.drawImage(Game.#backgroundImage, 0, 0)
     this.#player.draw();
+    this.drawBags();
+    Game.#barriers.forEach(x => x.draw());
     Game.#staticObjects.forEach(x => x.draw());
     Game.#movingObjects.forEach(x => x.draw());
     // Game.#movingObjects.forEach(x => x.tempDraw(this.#context));
@@ -114,7 +130,7 @@ export class Game {
   checkBarriers (r1x, r1y, r1w, r1h) {
     let collision = false;
   
-    Game.#staticObjects.forEach(barrier => {
+    Game.#barriers.forEach(barrier => {
       let r2x = barrier.endPoints().x;
       let r2y = barrier.endPoints().y;
       let r2w = barrier.width;
@@ -144,12 +160,78 @@ export class Game {
       }
     });
 
-    
-
     if (collision && objectType !== enemyType.CLAIM_JUMPER) {
       setTimeout(() => clearInterval(this.gameInterval), 70);
     }
 
     return collision;
+  }
+
+  checkStatic(r1x, r1y, r1w, r1h) {
+    Game.#staticObjects.forEach(object => {
+      let r2x = object.endPoints().x;
+      let r2y = object.endPoints().y;
+      let r2w = object.width;
+      let r2h = object.height;
+      
+      if (r1x + r1w >= r2x && r1x <= r2x + r2w && r1y + r1h >= r2y && r1y <= r2y + r2h) {
+          if(!this.#player.haveTNT && object.type === staticTypes.TNT) {
+            Game.#staticObjects = Game.#staticObjects.filter(x => x.id !== object.id);
+            this.#player.haveTNT = true;
+          }
+      }
+    });
+  }
+
+  checkMines(x, y) {
+    if (!this.#player.haveTNT || x > 40 || x < 38) {
+      return;
+    }
+
+    if (y >= 6 && y < 8 && !this.#mines.one) {
+      this.#mines.one = true;
+      this.#player.haveTNT = false;
+      console.log ('MINE TOP');
+    }
+
+    if (y >= 123 && y < 125 && !this.#mines.two) {
+      this.#mines.two = true;
+      this.#player.haveTNT = false;
+      console.log ('MINE SECOND');
+    }
+
+    if (y >= 243 && y < 245 && !this.#mines.three) {
+      this.#mines.three = true;
+      this.#player.haveTNT = false;
+      console.log ('MINE THREE');
+    }
+
+    if (y >= 363 && y < 365 && !this.#mines.four) {
+      this.#mines.four = true;
+      this.#player.haveTNT = false;
+      console.log ('MINE BOTTOM');
+    }
+  }
+
+  drawBags() {
+    if (this.#mines.one) {
+      this.#context.drawImage(Game.#bagImage, 39, 19);
+    }
+
+    if (this.#mines.two) {
+      this.#context.drawImage(Game.#bagImage, 39, 138);
+    }
+
+    if (this.#mines.three) {
+      this.#context.drawImage(Game.#bagImage, 39, 257);
+    }
+
+    if (this.#mines.four) {
+      this.#context.drawImage(Game.#bagImage, 39, 376);
+    }
+  }
+
+  createBag(position) {
+    
   }
 }

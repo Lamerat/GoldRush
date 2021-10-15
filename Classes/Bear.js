@@ -2,7 +2,7 @@ import { enemyType } from '../common/enemy-type.js';
 import { MobileObject } from './MobileObject.js';
 
 export class Bear extends MobileObject {
-  static #bearImage = '../GoldRush/images/bear.png';
+  static #bearImage = '../images/bear.png';
   static #startPositions = [
     { x: 454, y: 280 }
   ];
