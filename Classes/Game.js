@@ -8,10 +8,11 @@ import { Dynamite } from './Dynamite.js';
 import staticTypes from '../common/static-types.js';
 import { Score } from './Score.js';
 import { gameLevels } from '../common/levels.js';
+import { BlowMine } from './BlowMine.js';
+import { bagsData } from '../common/bags-data.js';
 
 export class Game {
   static #bagImage = new Image ();
-  
   static #backgroundImage = new Image();
   static #singleton = false;
   static #gameActions = { left: false, right: false, up: false, down: false };
@@ -19,29 +20,25 @@ export class Game {
   static #movingObjects = [];
   static #staticObjects = [];
   static #JumperReturner;
-
-  #gameInterval;
+  static #mineBlow;
+  #mines = {one: false, two: false, three: false, four: false};
+  #context;
   #level = 1;
   #scoreBoard;
   #currentTNT;
-  #mines = {one: false, two: false, three: false, four: false};
   #player;
-  #context;
-  #height;
-  #width;
+  #gameInterval;
+
 
   constructor (context) {
     if (Game.#singleton) {
       return;
     }
+
     this.#context = context;
-    this.#height = this.#context.canvas.height;
-    this.#width = this.#context.canvas.width;
     Game.#singleton = true;
     Game.#backgroundImage.src = './images/background.png';
     Game.#bagImage.src = './images/bag.png'
-    this.#width = this.#context.canvas.width;
-    this.#height = this.#context.canvas.height;
     this.#scoreBoard = new Score(context);
     this.#player = new Player(context);
     staticObjectsCoordinates.forEach(coords => Game.#barriers.push(new StaticObject(this.#context, ...coords)));
@@ -69,7 +66,6 @@ export class Game {
     gameLevels[this.#level].movingObjects.forEach(object => Game.#movingObjects.push(object(this.#context, this.#level)));
     this.#player.resetPosition();
   }
-
 
   actions(action) {
     switch (action) {
@@ -103,7 +99,6 @@ export class Game {
   } 
 
   frame() {
-    this.#context.clearRect(0, 0, this.#width, this.#height);
     this.draw();
     this.update();
   }
@@ -132,12 +127,16 @@ export class Game {
     this.checkMines(this.#player.endPoints().x, this.#player.endPoints().y);
   }
 
+  drawBackGround () {
+    this.#context.drawImage(Game.#backgroundImage, 0, 0);
+    this.#scoreBoard.draw();
+    this.#scoreBoard.draw();
+    this.drawBags();
+  }
 
   draw() {
-    this.#context.drawImage(Game.#backgroundImage, 0, 0);
+    this.drawBackGround();
     this.#player.draw();
-    this.drawBags();
-    this.#scoreBoard.draw();
     Game.#barriers.forEach(x => x.draw());
     Game.#staticObjects.forEach(x => x.draw());
     Game.#movingObjects.forEach(x => x.draw());
@@ -152,16 +151,36 @@ export class Game {
     this.#gameInterval = setInterval(() => this.drawOnlyJumper(), 1000.0/60.0);
   }
 
+  drawBlow(mine) {
+    this.drawBackGround();
+
+    if (Game.#mineBlow.draw() > 6) {
+      clearInterval(this.#gameInterval);
+      this.#mines[bagsData[mine].name] = true;
+      this.resetRound();
+      this.#gameInterval = setInterval(() => this.frame(), 1000/60);
+      return;
+    }
+  }
+
+  setDynamite(mine) {
+    clearInterval(this.#gameInterval);
+    Game.#mineBlow = new BlowMine(this.#context, {x: bagsData[mine].x, y: bagsData[mine].y});
+    this.drawBlow();
+    this.#gameInterval = setInterval(() => this.drawBlow(mine), 400);
+    this.#scoreBoard.updateScore();
+  }
+
   drawOnlyJumper() {
-    this.#context.drawImage(Game.#backgroundImage, 0, 0);
-    this.drawBags();
-    this.#scoreBoard.draw();
+    this.drawBackGround();
+    
     if (Game.#JumperReturner.update()) {
       clearInterval(this.#gameInterval);
       this.resetRound();
       this.#gameInterval = setInterval(() => this.frame(), 1000.0/60.0);
       return;
     }
+
     Game.#JumperReturner.draw();
   }
 
@@ -235,50 +254,37 @@ export class Game {
     }
 
     if (y >= 6 && y < 8 && !this.#mines.one) {
-      this.#mines.one = true;
-      this.#player.haveTNT = false;
-      this.#scoreBoard.updateScore();
-      console.log ('MINE TOP');
+      this.setDynamite(1);
     }
 
     if (y >= 123 && y < 125 && !this.#mines.two) {
-      this.#mines.two = true;
-      this.#player.haveTNT = false;
-      this.#scoreBoard.updateScore();
-      console.log ('MINE SECOND');
+      this.setDynamite(2);
     }
 
     if (y >= 243 && y < 245 && !this.#mines.three) {
-      this.#mines.three = true;
-      this.#player.haveTNT = false;
-      this.#scoreBoard.updateScore();
-      console.log ('MINE THREE');
+      this.setDynamite(3);
     }
 
     if (y >= 363 && y < 365 && !this.#mines.four) {
-      this.#mines.four = true;
-      this.#player.haveTNT = false;
-      this.#scoreBoard.updateScore();
-      console.log ('MINE BOTTOM');
+      this.setDynamite(4);
     }
   }
 
-
   drawBags() {
     if (this.#mines.one) {
-      this.#context.drawImage(Game.#bagImage, 39, 19);
+      this.#context.drawImage(Game.#bagImage, bagsData[1].x, bagsData[1].y);
     }
 
     if (this.#mines.two) {
-      this.#context.drawImage(Game.#bagImage, 39, 138);
+      this.#context.drawImage(Game.#bagImage, bagsData[2].x, bagsData[2].y);
     }
 
     if (this.#mines.three) {
-      this.#context.drawImage(Game.#bagImage, 39, 257);
+      this.#context.drawImage(Game.#bagImage, bagsData[3].x, bagsData[3].y);
     }
 
     if (this.#mines.four) {
-      this.#context.drawImage(Game.#bagImage, 39, 376);
+      this.#context.drawImage(Game.#bagImage, bagsData[4].x, bagsData[4].y);
     }
   }
 }
