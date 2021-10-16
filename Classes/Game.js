@@ -2,14 +2,12 @@ import { gameActions } from '../common/game-actions.js';
 import { Player } from './Player.js';
 import { StaticObject } from './StaticObject.js';
 import { staticObjectsCoordinates } from '../common/static-objects-coordinates.js';
-import { Indian } from './Indian.js';
-import { Solider } from './Solider.js';
-import { Bear } from './Bear.js';
 import { ClaimJumper } from './ClaimJumper.js';
 import { enemyType } from '../common/enemy-type.js';
 import { Dynamite } from './Dynamite.js';
 import staticTypes from '../common/static-types.js';
 import { Score } from './Score.js';
+import { gameLevels } from '../common/levels.js';
 
 export class Game {
   static #bagImage = new Image ();
@@ -20,8 +18,10 @@ export class Game {
   static #barriers = [];
   static #movingObjects = [];
   static #staticObjects = [];
+  static #JumperReturner;
 
-  gameInterval;
+  #gameInterval;
+  #level = 1;
   #scoreBoard;
   #currentTNT;
   #mines = {one: false, two: false, three: false, four: false};
@@ -44,17 +44,30 @@ export class Game {
     this.#height = this.#context.canvas.height;
     this.#scoreBoard = new Score(context);
     this.#player = new Player(context);
-
     staticObjectsCoordinates.forEach(coords => Game.#barriers.push(new StaticObject(this.#context, ...coords)));
 
-    Game.#movingObjects.push(new Indian(this.#context));
-    Game.#movingObjects.push(new Solider(this.#context));
-    Game.#movingObjects.push(new Bear(this.#context));
-    Game.#movingObjects.push(new ClaimJumper(this.#context));
-    Game.#staticObjects.push(new Dynamite(this.#context, 252, 25));
-    Game.#staticObjects.push(new Dynamite(this.#context, 155, 125));
-    Game.#staticObjects.push(new Dynamite(this.#context, 155, 250));
-    Game.#staticObjects.push(new Dynamite(this.#context, 155, 445));
+    this.changeLevel();
+    this.changeRound();
+    this.#gameInterval = setInterval(() => this.frame(), 1000.0/60.0);
+  }
+
+  changeLevel() {
+    gameLevels[this.#level].movingObjects.forEach(object => Game.#movingObjects.push(object(this.#context, this.#level)));
+  }
+
+  changeRound() {
+    Game.#staticObjects = [];
+    const randomDynamite = new Set();
+    while (randomDynamite.size < 4) {
+      randomDynamite.add(Math.floor(Math.random() * 10) + 1);
+    }
+    randomDynamite.forEach(dynamite => Game.#staticObjects.push(new Dynamite(this.#context, dynamite)));
+  }
+
+  resetRound() {
+    Game.#movingObjects = [];
+    gameLevels[this.#level].movingObjects.forEach(object => Game.#movingObjects.push(object(this.#context, this.#level)));
+    this.#player.resetPosition();
   }
 
 
@@ -121,7 +134,7 @@ export class Game {
 
 
   draw() {
-    this.#context.drawImage(Game.#backgroundImage, 0, 0)
+    this.#context.drawImage(Game.#backgroundImage, 0, 0);
     this.#player.draw();
     this.drawBags();
     this.#scoreBoard.draw();
@@ -129,6 +142,27 @@ export class Game {
     Game.#staticObjects.forEach(x => x.draw());
     Game.#movingObjects.forEach(x => x.draw());
     // Game.#movingObjects.forEach(x => x.tempDraw(this.#context));
+  }
+
+  returnDynamite() {
+    clearInterval(this.#gameInterval);
+    Game.#staticObjects.push(this.#currentTNT);
+    this.#player.haveTNT = false;
+    Game.#JumperReturner = new ClaimJumper(this.#context, this.#level, true, this.#currentTNT.position);
+    this.#gameInterval = setInterval(() => this.drawOnlyJumper(), 1000.0/60.0);
+  }
+
+  drawOnlyJumper() {
+    this.#context.drawImage(Game.#backgroundImage, 0, 0);
+    this.drawBags();
+    this.#scoreBoard.draw();
+    if (Game.#JumperReturner.update()) {
+      clearInterval(this.#gameInterval);
+      this.resetRound();
+      this.#gameInterval = setInterval(() => this.frame(), 1000.0/60.0);
+      return;
+    }
+    Game.#JumperReturner.draw();
   }
 
 
@@ -142,7 +176,7 @@ export class Game {
       let r2h = barrier.height;
       
       if (r1x + r1w >= r2x && r1x <= r2x + r2w && r1y + r1h >= r2y && r1y <= r2y + r2h) {
-          collision =  true;
+        collision =  true;
       }
     })
 
@@ -168,11 +202,10 @@ export class Game {
     if (collision) {
       if (objectType === enemyType.CLAIM_JUMPER) {
         if (this.#player.haveTNT) {
-          Game.#staticObjects.push(this.#currentTNT);
-          this.#player.haveTNT = false;
+          setTimeout(() => this.returnDynamite(), 30);
         }
       } else {
-        setTimeout(() => clearInterval(this.gameInterval), 70);
+        setTimeout(() => clearInterval(this.#gameInterval), 70);
       }
     }
 
@@ -187,11 +220,11 @@ export class Game {
       let r2h = object.height;
       
       if (r1x + r1w >= r2x && r1x <= r2x + r2w && r1y + r1h >= r2y && r1y <= r2y + r2h) {
-          if(!this.#player.haveTNT && object.type === staticTypes.TNT) {
-            Game.#staticObjects = Game.#staticObjects.filter(x => x.id !== object.id);
-            this.#player.haveTNT = true;
-            this.#currentTNT = object;
-          }
+        if(!this.#player.haveTNT && object.type === staticTypes.TNT) {
+          Game.#staticObjects = Game.#staticObjects.filter(x => x.id !== object.id);
+          this.#player.haveTNT = true;
+          this.#currentTNT = object;
+        }
       }
     });
   }
@@ -230,6 +263,7 @@ export class Game {
     }
   }
 
+
   drawBags() {
     if (this.#mines.one) {
       this.#context.drawImage(Game.#bagImage, 39, 19);
@@ -246,9 +280,5 @@ export class Game {
     if (this.#mines.four) {
       this.#context.drawImage(Game.#bagImage, 39, 376);
     }
-  }
-
-  createBag(position) {
-    
   }
 }

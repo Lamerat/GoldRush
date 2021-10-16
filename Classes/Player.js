@@ -76,10 +76,12 @@ export class Player {
 
   draw() {
     this.#context.drawImage(Player.#playerImage, this.#xPos - this.#playerWidth / 2, this.#yPos - this.playerHeight / 2);
-    // this.#context.beginPath();
-    // this.#context.fillStyle = 'orange';
-    // this.#context.rect(this.#xPos - this.#playerWidth /2, this.#yPos - this.#playerHeight / 2, this.#playerWidth, this.#playerHeight );
-    // this.#context.fill();
+  }
+
+  resetPosition() {
+    this.#xPos = 800;
+    this.#yPos = 300;
+    this.#haveTNT = false;
   }
 
   endPoints() {

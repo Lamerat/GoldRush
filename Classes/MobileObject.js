@@ -11,6 +11,7 @@ export class MobileObject {
   #nextIndex = 0;
   #xIsOk = false;
   #yIsOk = false;
+  #updateLap = 0;
 
 
   constructor(canvas, imageSource, startX, startY, points) {
@@ -93,14 +94,15 @@ export class MobileObject {
 
     if (this.#xIsOk && this.#yIsOk) {
       if (this.#points.length - 1 === this.#nextIndex) {
-        this.#nextIndex = 0;  
+        this.#nextIndex = 0;
+        this.#updateLap = this.#updateLap + 1;
       } else {
         this.#nextIndex = this.#nextIndex + 1;
       }
       this.#xIsOk = false;
       this.#yIsOk = false;
     }
-    
+    return (this.#updateLap);
   }
 
   draw() {

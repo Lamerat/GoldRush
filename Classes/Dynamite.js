@@ -1,3 +1,4 @@
+import { dynamitePositions } from '../common/dynamite-positions.js';
 import staticTypes from '../common/static-types.js';
 
 export class Dynamite {
@@ -11,6 +12,7 @@ export class Dynamite {
   #width;
   #height;
   #id;
+  #position;
 
   get type() {
     return this.#type;
@@ -36,11 +38,16 @@ export class Dynamite {
     return this.#yPos;
   }
 
+  get position() {
+    return this.#position;
+  }
 
-  constructor (canvas, x, y) {
+
+  constructor (canvas, position) {
     this.#context = canvas;
-    this.#xPos = x;
-    this.#yPos = y;
+    this.#position = position;
+    this.#xPos = dynamitePositions[position][0];
+    this.#yPos = dynamitePositions[position][1];
     this.#dynamiteImage.src = Dynamite.#dynamiteImagePath;
     this.#width = this.#dynamiteImage.width;
     this.#height = this.#dynamiteImage.height;

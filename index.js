@@ -54,4 +54,4 @@ document.addEventListener('keyup', (event) => {
 });
 
 
-game.gameInterval = setInterval(() => game.frame(), 1000.0/60.0);
+// game.gameInterval = setInterval(() => game.frame(), 1000.0/60.0);
