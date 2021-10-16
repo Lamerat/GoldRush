@@ -9,6 +9,7 @@ import { ClaimJumper } from './ClaimJumper.js';
 import { enemyType } from '../common/enemy-type.js';
 import { Dynamite } from './Dynamite.js';
 import staticTypes from '../common/static-types.js';
+import { Score } from './Score.js';
 
 export class Game {
   static #bagImage = new Image ();
@@ -21,6 +22,7 @@ export class Game {
   static #staticObjects = [];
 
   gameInterval;
+  #scoreBoard;
   #currentTNT;
   #mines = {one: false, two: false, three: false, four: false};
   #player;
@@ -40,6 +42,7 @@ export class Game {
     Game.#bagImage.src = './images/bag.png'
     this.#width = this.#context.canvas.width;
     this.#height = this.#context.canvas.height;
+    this.#scoreBoard = new Score(context);
     this.#player = new Player(context);
 
     staticObjectsCoordinates.forEach(coords => Game.#barriers.push(new StaticObject(this.#context, ...coords)));
@@ -121,6 +124,7 @@ export class Game {
     this.#context.drawImage(Game.#backgroundImage, 0, 0)
     this.#player.draw();
     this.drawBags();
+    this.#scoreBoard.draw();
     Game.#barriers.forEach(x => x.draw());
     Game.#staticObjects.forEach(x => x.draw());
     Game.#movingObjects.forEach(x => x.draw());
@@ -200,24 +204,28 @@ export class Game {
     if (y >= 6 && y < 8 && !this.#mines.one) {
       this.#mines.one = true;
       this.#player.haveTNT = false;
+      this.#scoreBoard.updateScore();
       console.log ('MINE TOP');
     }
 
     if (y >= 123 && y < 125 && !this.#mines.two) {
       this.#mines.two = true;
       this.#player.haveTNT = false;
+      this.#scoreBoard.updateScore();
       console.log ('MINE SECOND');
     }
 
     if (y >= 243 && y < 245 && !this.#mines.three) {
       this.#mines.three = true;
       this.#player.haveTNT = false;
+      this.#scoreBoard.updateScore();
       console.log ('MINE THREE');
     }
 
     if (y >= 363 && y < 365 && !this.#mines.four) {
       this.#mines.four = true;
       this.#player.haveTNT = false;
+      this.#scoreBoard.updateScore();
       console.log ('MINE BOTTOM');
     }
   }
