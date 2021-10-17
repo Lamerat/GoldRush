@@ -7,6 +7,9 @@ export class Score {
   #hiScore = 0;
   #lives = 2;
 
+  #timer;
+  #targetScore;
+
   constructor(canvas) {
     Score.#livesImage.src = './images/player.png';
     this.#context = canvas;
@@ -32,7 +35,14 @@ export class Score {
   }
 
   updateScore(bonus = 0) {
-    this.#score = this.#score + Score.#goldScore + bonus;
+    this.#targetScore = this.#score + Score.#goldScore + bonus;
+    this.#timer = setInterval(() => this.endScore(), 100);
   }
 
+  endScore() {
+    this.#score = this.#score + 20;
+    if (this.#targetScore === this.#score) {
+      clearInterval(this.#timer);
+    }
+  }
 }

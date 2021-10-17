@@ -130,13 +130,14 @@ export class Game {
   drawBackGround () {
     this.#context.drawImage(Game.#backgroundImage, 0, 0);
     this.#scoreBoard.draw();
-    this.#scoreBoard.draw();
     this.drawBags();
   }
 
-  draw() {
+  draw(player = true) {
     this.drawBackGround();
-    this.#player.draw();
+    if (player) {
+      this.#player.draw();
+    }
     Game.#barriers.forEach(x => x.draw());
     Game.#staticObjects.forEach(x => x.draw());
     Game.#movingObjects.forEach(x => x.draw());
@@ -152,9 +153,8 @@ export class Game {
   }
 
   drawBlow(mine) {
-    this.drawBackGround();
-
-    if (Game.#mineBlow.draw() > 6) {
+    this.draw(false);
+    if (Game.#mineBlow.draw() > 8) {
       clearInterval(this.#gameInterval);
       this.#mines[bagsData[mine].name] = true;
       this.resetRound();
