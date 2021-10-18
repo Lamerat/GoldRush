@@ -13,17 +13,17 @@ export class BlowMine {
     this.#yBag = position.y;
     this.#xDynamite = position.x - 20;
     this.#yDynamite = position.y - 12;
-    BlowMine.#blowImage.src = '../images/tnt.png';
+    BlowMine.#blowImage.src = './images/tnt.png';
     this.#context.drawImage(BlowMine.#blowImage, this.#xDynamite, this.#yDynamite);
   }
 
 
   draw() {
     if (this.#counter % 2) {
-      BlowMine.#blowImage.src = '../images/tnt.png';
+      BlowMine.#blowImage.src = './images/tnt.png';
       this.#context.drawImage(BlowMine.#blowImage, this.#xDynamite, this.#yDynamite);
     } else {
-      BlowMine.#blowImage.src = '../images/bag.png';
+      BlowMine.#blowImage.src = './images/bag.png';
       this.#context.drawImage(BlowMine.#blowImage, this.#xBag, this.#yBag);
     }
 

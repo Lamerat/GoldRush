@@ -10,6 +10,8 @@ import { Score } from './Score.js';
 import { gameLevels } from '../common/levels.js';
 import { BlowMine } from './BlowMine.js';
 import { bagsData } from '../common/bags-data.js';
+import { Tool } from './Tool.js';
+import { TOOLS } from '../common/images-path.js';
 
 export class Game {
   static #bagImage = new Image ();
@@ -36,6 +38,9 @@ export class Game {
     }
 
     this.#context = context;
+
+    
+
     Game.#singleton = true;
     Game.#backgroundImage.src = './images/background.png';
     Game.#bagImage.src = './images/bag.png'
@@ -59,6 +64,7 @@ export class Game {
       randomDynamite.add(Math.floor(Math.random() * 10) + 1);
     }
     randomDynamite.forEach(dynamite => Game.#staticObjects.push(new Dynamite(this.#context, dynamite)));
+    Game.#staticObjects.push(new Tool(this.#context, TOOLS.PICKAXE));
   }
 
   resetRound() {
@@ -131,6 +137,13 @@ export class Game {
     this.#context.drawImage(Game.#backgroundImage, 0, 0);
     this.#scoreBoard.draw();
     this.drawBags();
+
+    // this.#context.strokeStyle = 'red';
+    // this.#context.moveTo(620, 0);
+    // this.#context.lineTo(620, 600);
+    // this.#context.moveTo(0, 120);
+    // this.#context.lineTo(880, 120);
+    // this.#context.stroke();
   }
 
   draw(player = true) {
@@ -243,6 +256,9 @@ export class Game {
           Game.#staticObjects = Game.#staticObjects.filter(x => x.id !== object.id);
           this.#player.haveTNT = true;
           this.#currentTNT = object;
+        } else if (object.type === staticTypes.TOOL) {
+          console.log ('OK')
+          Game.#staticObjects = Game.#staticObjects.filter(x => x.type !== staticTypes.TOOL);
         }
       }
     });
