@@ -1,6 +1,7 @@
 import staticTypes from '../common/static-types.js';
 
 export class Tool {
+  static #pickSound = new Audio('./sounds/pick_tool.wav');
   #toolImage = new Image();
   #type = staticTypes.TOOL;
   #context;
@@ -40,5 +41,9 @@ export class Tool {
       x: this.#xPos - this.#width / 2,
       y: this.#yPos - this.#height / 2,
     }
+  }
+
+  playPickSound() {
+    Tool.#pickSound.play();
   }
 }

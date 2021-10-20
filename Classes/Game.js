@@ -167,9 +167,9 @@ export class Game {
 
   drawBlow(mine) {
     this.draw(false);
-    if (Game.#mineBlow.draw() > 8) {
-      clearInterval(this.#gameInterval);
+    if (Game.#mineBlow.draw() && this.#scoreBoard.finishCalculation) {
       this.#mines[bagsData[mine].name] = true;
+      clearInterval(this.#gameInterval);
       this.resetRound();
       this.#gameInterval = setInterval(() => this.frame(), 1000/60);
       return;
@@ -181,7 +181,8 @@ export class Game {
     Game.#mineBlow = new BlowMine(this.#context, {x: bagsData[mine].x, y: bagsData[mine].y});
     this.drawBlow();
     this.#gameInterval = setInterval(() => this.drawBlow(mine), 400);
-    this.#scoreBoard.updateScore();
+    const bonus = this.#player.haveTool ? 100 : 0
+    this.#scoreBoard.updateScore(bonus);
   }
 
   drawOnlyJumper() {
@@ -253,11 +254,13 @@ export class Game {
       
       if (r1x + r1w >= r2x && r1x <= r2x + r2w && r1y + r1h >= r2y && r1y <= r2y + r2h) {
         if(!this.#player.haveTNT && object.type === staticTypes.TNT) {
+          object.playPickSound();
           Game.#staticObjects = Game.#staticObjects.filter(x => x.id !== object.id);
           this.#player.haveTNT = true;
           this.#currentTNT = object;
         } else if (object.type === staticTypes.TOOL) {
-          console.log ('OK')
+          object.playPickSound();
+          this.#player.haveTool = true;
           Game.#staticObjects = Game.#staticObjects.filter(x => x.type !== staticTypes.TOOL);
         }
       }

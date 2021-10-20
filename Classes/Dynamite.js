@@ -2,6 +2,7 @@ import { dynamitePositions } from '../common/dynamite-positions.js';
 import staticTypes from '../common/static-types.js';
 
 export class Dynamite {
+  static #pickSound = new Audio('./sounds/pick.wav');
   static #dynamiteId = 0;
   static #dynamiteImagePath = './images/tnt.png';
   #dynamiteImage = new Image();
@@ -66,5 +67,9 @@ export class Dynamite {
       x: this.#xPos - this.#width / 2,
       y: this.#yPos - this.#height / 2,
     }
+  }
+
+  playPickSound() {
+    Dynamite.#pickSound.play();
   }
 }

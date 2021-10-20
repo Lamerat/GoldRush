@@ -1,5 +1,6 @@
 export class BlowMine {
   static #blowImage = new Image();
+  static #moneySound = new Audio('./sounds/coins.wav');
   #counter = 1;
   #context;
   #xBag;
@@ -8,6 +9,7 @@ export class BlowMine {
   #yDynamite;
   
   constructor(canvas, position) {
+    BlowMine.#moneySound.play();
     this.#context = canvas;
     this.#xBag = position.x;
     this.#yBag = position.y;
@@ -19,16 +21,24 @@ export class BlowMine {
 
 
   draw() {
-    if (this.#counter % 2) {
-      BlowMine.#blowImage.src = './images/tnt.png';
-      this.#context.drawImage(BlowMine.#blowImage, this.#xDynamite, this.#yDynamite);
+    
+    if (this.#counter % 2 && this.#counter <= 8) {
+      this.drawTNT();
     } else {
-      BlowMine.#blowImage.src = './images/bag.png';
-      this.#context.drawImage(BlowMine.#blowImage, this.#xBag, this.#yBag);
+      this.drawBag();
     }
 
     this.#counter++;
-    
-    return this.#counter;
-  }  
+    return this.#counter > 8 ? true : false;
+  }
+
+  drawTNT() {
+    BlowMine.#blowImage.src = './images/tnt.png';
+    this.#context.drawImage(BlowMine.#blowImage, this.#xDynamite, this.#yDynamite);
+  }
+
+  drawBag() {
+    BlowMine.#blowImage.src = './images/bag.png';
+    this.#context.drawImage(BlowMine.#blowImage, this.#xBag, this.#yBag);
+  }
 }

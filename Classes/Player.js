@@ -8,6 +8,7 @@ export class Player {
   #playerHeight;
   #moveStep = 3;
   #haveTNT = false;
+  #haveTool = false;
 
   #minX;
   #maxX;
@@ -42,11 +43,22 @@ export class Player {
     return this.#haveTNT;
   }
 
+  get haveTool() {
+    return this.#haveTool;
+  }
+
   set haveTNT(value) {
     if (typeof value !== 'boolean') {
       throw new Error ('haveTNT must be boolean!');
     }
     this.#haveTNT = value;
+  }
+
+  set haveTool(value) {
+    if (typeof value !== 'boolean') {
+      throw new Error ('haveTNT must be boolean!');
+    }
+    this.#haveTool = value;
   }
 
 
@@ -82,6 +94,7 @@ export class Player {
     this.#xPos = 800;
     this.#yPos = 300;
     this.#haveTNT = false;
+    this.#haveTool = false;
   }
 
   endPoints() {

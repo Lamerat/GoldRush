@@ -1,14 +1,22 @@
 export class Score {
   static #livesImage = new Image();
+  static #increaseInterval = 100;
   static #goldScore = 400;
 
   #context;
   #score = 0;
   #hiScore = 0;
+  #bonus = 0;
+  #increaseValue = 20;
   #lives = 2;
+  #finishCalculation = true;
 
   #timer;
   #targetScore;
+
+  get finishCalculation() {
+    return this.#finishCalculation;
+  }
 
   constructor(canvas) {
     Score.#livesImage.src = './images/player.png';
@@ -35,14 +43,27 @@ export class Score {
   }
 
   updateScore(bonus = 0) {
-    this.#targetScore = this.#score + Score.#goldScore + bonus;
-    this.#timer = setInterval(() => this.endScore(), 100);
+    this.#increaseValue = 20;
+    this.#finishCalculation = false;
+    this.#bonus = bonus;
+    this.#targetScore = this.#score + Score.#goldScore;
+    this.#timer = setInterval(() => this.endScore(), Score.#increaseInterval);
   }
 
   endScore() {
-    this.#score = this.#score + 20;
+    this.#score = this.#score + this.#increaseValue;
     if (this.#targetScore === this.#score) {
       clearInterval(this.#timer);
+      this.#increaseValue = 10;
+
+      if (this.#bonus === 0) {
+        this.#finishCalculation = true;
+        return;
+      }
+
+      this.#targetScore = this.#score + this.#bonus;
+      this.#bonus = 0;
+      setTimeout(() => this.#timer = setInterval(() => this.endScore(), Score.#increaseInterval), 600);
     }
   }
 }
