@@ -25,15 +25,20 @@ export class Tool {
 
   constructor (canvas, image) {
     this.#context = canvas;
-    this.#xPos = 620;
-    this.#yPos = 120;
     this.#toolImage.src = image;
     this.#width = this.#toolImage.width;
     this.#height = this.#toolImage.height;
+    // this.#xPos = 620 - this.#width / 2;
+    // this.#yPos = 120 - this.#height / 2;
+    this.#xPos = 620
+    this.#yPos = 120
   }
 
   draw() {
-    this.#context.drawImage(this.#toolImage, this.#xPos - this.#width / 2, this.#yPos - this.#height / 2);
+    const x = this.#xPos - this.#width / 2;
+    const y = this.#yPos - this.#height / 2;
+    // this.#context.drawImage(this.#toolImage, this.#xPos, this.#yPos);
+    this.#context.drawImage(this.#toolImage, x, y);
   }
 
   endPoints() {

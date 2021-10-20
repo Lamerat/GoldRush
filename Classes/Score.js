@@ -10,6 +10,8 @@ export class Score {
   #increaseValue = 20;
   #lives = 2;
   #finishCalculation = true;
+  #levelImages = [];
+  #nextImage = 10;
 
   #timer;
   #targetScore;
@@ -22,6 +24,14 @@ export class Score {
     Score.#livesImage.src = './images/player.png';
     this.#context = canvas;
     this.#context.font ='20px Arial';
+  }
+
+  addLevelImage(image) {
+    const img = new Image();
+    img.src = image;
+    this.#levelImages.push({image: img, xPos: this.#nextImage});
+    const xPos = this.#nextImage + img.width + 2;
+    this.#nextImage = xPos;
   }
 
   scoreFormat(value) {
@@ -40,6 +50,12 @@ export class Score {
     this.#context.fillText(this.scoreFormat(this.#hiScore), 805, 550);
 
     this.#context.drawImage(Score.#livesImage, 845, 560, 24, 30);
+
+    this.#levelImages.forEach(el => {
+      const height = el.image.height - 5;
+      const width = (el.image.width / el.image.height) * height;
+      this.#context.drawImage(el.image, el.xPos, 560, width, height);
+    })
   }
 
   updateScore(bonus = 0) {

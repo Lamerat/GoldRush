@@ -55,6 +55,7 @@ export class Game {
 
   changeLevel() {
     gameLevels[this.#level].movingObjects.forEach(object => Game.#movingObjects.push(object(this.#context, this.#level)));
+    this.#scoreBoard.addLevelImage(gameLevels[this.#level].tool);
   }
 
   changeRound() {
@@ -64,7 +65,7 @@ export class Game {
       randomDynamite.add(Math.floor(Math.random() * 10) + 1);
     }
     randomDynamite.forEach(dynamite => Game.#staticObjects.push(new Dynamite(this.#context, dynamite)));
-    Game.#staticObjects.push(new Tool(this.#context, TOOLS.PICKAXE));
+    Game.#staticObjects.push(new Tool(this.#context, gameLevels[this.#level].tool));
   }
 
   resetRound() {
